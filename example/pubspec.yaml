@@ -1,0 +1,14 @@
+name: flutter_analytics_example
+description: Example usage of flutter_analysis_client
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter_analysis_client:
+    path: ../
+
+dev_dependencies:
+  test: ^1.24.0

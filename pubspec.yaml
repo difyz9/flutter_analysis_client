@@ -1,0 +1,47 @@
+name: flutter_analysis_client
+description: A lightweight analytics client SDK for Flutter applications, providing event tracking, user behavior analysis, and data collection capabilities.
+version: 1.0.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # HTTP client for network requests
+  http: ^1.1.0
+  
+  # UUID generation for device and session IDs
+  uuid: ^4.1.0
+  
+  # Device information for analytics (compatible versions)
+  device_info_plus: ^9.1.2
+  
+  # Package information (app version, etc.)
+  package_info_plus: ^4.2.0
+  
+  # For persistent storage of device ID
+  shared_preferences: ^2.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  test: ^1.24.0
+  
+  # Linting rules
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: false
+
+# Platform support
+platforms:
+  android:
+  ios:
+  web:
+  windows:
+  macos:
+  linux:
