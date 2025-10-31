@@ -5,7 +5,7 @@ Flutter Analysis Client 现在支持根据产品名称检查状态，用于控�
 ## API 端点
 
 ```bash
-curl -X GET 'http://localhost:8080/api/products/DigiBankApp' \
+curl -X GET 'http://localhost:8080/api/products/HelloWorldApp' \
   -H 'accept: application/json'
 ```
 
@@ -15,8 +15,8 @@ curl -X GET 'http://localhost:8080/api/products/DigiBankApp' \
 {
   "code": 0,
   "data": {
-    "name": "DigiBankApp",
-    "display_name": "DigiBankApp", 
+    "name": "HelloWorldApp",
+    "display_name": "HelloWorldApp", 
     "description": "",
     "icon_url": "",
     "homepage_url": "",
@@ -80,7 +80,7 @@ if (statusResult.isSuccess) {
 void main() {
   Analytics.initialize(
     serverUrl: 'http://localhost:8080',
-    productName: 'DigiBankApp',
+    productName: 'HelloWorldApp',
   );
   
   runApp(MyApp());

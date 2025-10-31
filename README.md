@@ -6,6 +6,8 @@
 
 Flutter Analysis Client 是一个轻量级、高性能的 Flutter 数据分析 SDK，支持事件追踪、用户行为分析和业务数据收集。
 
+> 🚦 **新功能**: 现已支持基于服务器状态的应用启动控制！只有状态为 `active` 的产品才能正常启动，实现维护模式、版本控制等功能。
+
 ## ✨ 特性
 
 - 🚀 **高性能**: 异步事件上报，不影响主业务性能
@@ -17,6 +19,7 @@ Flutter Analysis Client 是一个轻量级、高性能的 Flutter 数据分析 S
 - 📈 **安装统计**: 自动收集安装信息和应用生命周期数据
 - 🔄 **会话管理**: 自动管理用户会话和设备识别
 - 🎛️ **灵活配置**: 支持批量大小、刷新间隔等灵活配置
+- 🚦 **启动控制**: 基于服务器状态的应用启动权限控制
 
 ## 📦 安装
 
@@ -60,7 +63,7 @@ flutter pub get
 ```dart
 import 'package:flutter_analysis_client/flutter_analysis_client.dart';
 
-void main() {
+void main() async {
   // 1. 在应用启动时初始化一次
   Analytics.initialize(
     serverUrl: 'http://localhost:8080',
@@ -68,10 +71,19 @@ void main() {
     debug: true,
   );
 
-  runApp(MyApp());
+  // 2. 检查应用是否可以启动（新功能）
+  final canLaunch = await Analytics.instance.canLaunchApp();
+  if (canLaunch.isSuccess && canLaunch.value) {
+    print('✅ 应用可以启动');
+    await Analytics.instance.reportLaunch();
+    runApp(MyApp());
+  } else {
+    print('❌ 应用无法启动，显示维护页面');
+    runApp(MaintenanceApp());
+  }
 }
 
-// 2. 在应用的任何地方使用 - 无需传递客户端实例！
+// 3. 在应用的任何地方使用 - 无需传递客户端实例！
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -125,18 +137,154 @@ void main() async {
     debug: true,
   );
 
-  // 2. 追踪事件
+  // 2. 检查应用启动权限（新功能）
+  final canLaunch = await client.canLaunchApp();
+  if (canLaunch.isSuccess && canLaunch.value) {
+    print('✅ 应用可以启动');
+    await client.reportLaunch();
+    // 继续应用启动流程
+  } else {
+    print('❌ 应用被禁止启动');
+    // 显示维护页面或退出
+  }
+
+  // 3. 追踪事件
   await client.trackEvent('button_click', {
     'button_name': 'login',
     'screen': 'home',
   });
 
-  // 3. 关闭客户端
+  // 4. 关闭客户端
   await client.close();
 }
 ```
 
 ## 📖 详细用法
+
+### 🚦 应用启动检查（新功能）
+
+Flutter Analysis Client 支持基于服务器状态的应用启动控制。只有当产品状态为 `active` 时，应用才能正常启动。
+
+#### 基本启动检查
+
+```dart
+void main() async {
+  // 初始化客户端
+  Analytics.initialize(
+    serverUrl: 'http://localhost:8080',
+    productName: 'HelloWorldApp',
+    debug: true,
+  );
+
+  // 检查是否可以启动
+  final canLaunch = await Analytics.instance.canLaunchApp();
+  
+  if (canLaunch.isSuccess && canLaunch.value) {
+    print('✅ 应用可以启动');
+    await Analytics.instance.reportLaunch();
+    runApp(MyApp());
+  } else {
+    print('❌ 应用无法启动');
+    runApp(MaintenanceApp());
+  }
+}
+```
+
+#### 详细状态检查
+
+```dart
+void main() async {
+  Analytics.initialize(/*...*/);
+
+  // 获取详细产品状态
+  final statusResult = await Analytics.instance.checkProductStatus();
+  
+  if (statusResult.isSuccess) {
+    final response = statusResult.value;
+    final productStatus = response.data;
+    
+    print('产品名称: ${productStatus?.name}');
+    print('当前状态: ${productStatus?.status}');
+    print('设备总数: ${productStatus?.totalDevices}');
+    print('7天活跃设备: ${productStatus?.activeDevices7d}');
+    
+    if (response.canLaunch) {
+      print('✅ 状态检查通过，启动应用');
+      runApp(MyApp());
+    } else {
+      print('❌ 状态检查失败: ${productStatus?.status}');
+      runApp(MaintenanceApp());
+    }
+  } else {
+    print('⚠️ 网络错误，使用离线模式启动');
+    runApp(MyApp()); // 优雅降级
+  }
+}
+```
+
+#### 启动管理器模式
+
+```dart
+class AppStartupManager {
+  static Future<bool> checkAndLaunch() async {
+    try {
+      // 初始化分析客户端
+      Analytics.initialize(
+        serverUrl: 'http://localhost:8080',
+        productName: 'HelloWorldApp',
+        debug: true,
+      );
+
+      // 检查产品状态
+      final result = await Analytics.instance.checkProductStatus();
+      
+      if (result.isFailure) {
+        // 网络错误，允许启动（优雅降级）
+        print('⚠️ 无法连接服务器，允许离线启动');
+        return true;
+      }
+
+      final response = result.value;
+      if (response.canLaunch) {
+        print('✅ 服务器授权成功');
+        await Analytics.instance.reportLaunch();
+        return true;
+      } else {
+        print('❌ 服务器拒绝启动: ${response.data?.status}');
+        return false;
+      }
+    } catch (e) {
+      print('💥 启动检查异常: $e');
+      return true; // 异常时允许启动
+    }
+  }
+}
+
+void main() async {
+  final canStart = await AppStartupManager.checkAndLaunch();
+  
+  if (canStart) {
+    runApp(MyApp());
+  } else {
+    runApp(MaintenanceApp());
+  }
+}
+```
+
+#### 状态检查 API 说明
+
+| 方法 | 返回类型 | 说明 |
+|------|----------|------|
+| `canLaunchApp([productName])` | `Result<bool>` | 简单检查是否可以启动 |
+| `checkProductStatus([productName])` | `Result<ProductStatusResponse>` | 获取详细产品状态 |
+
+**服务器 API 端点**: `GET /api/products/{productName}`
+
+**状态值说明**:
+- `active`: 应用可以正常启动 ✅
+- `inactive`: 应用被禁用 ❌
+- `maintenance`: 维护模式 🔧
+- 其他值: 应用无法启动 ❌
 
 ### 单例模式高级用法
 
@@ -524,6 +672,45 @@ final event = AnalyticsEvent(
 );
 ```
 
+### ProductStatus
+
+产品状态数据模型。
+
+```dart
+final status = ProductStatus(
+  name: 'HelloWorldApp',
+  displayName: 'HelloWorldApp',
+  status: 'active',
+  totalEvents: 1500,
+  totalDevices: 300,
+  activeDevices7d: 150,
+  activeDevices30d: 280,
+  // ... 其他字段
+);
+
+// 检查是否可以启动
+if (status.isActive) {
+  print('应用可以启动');
+}
+```
+
+### ProductStatusResponse
+
+产品状态响应包装器。
+
+```dart
+final response = ProductStatusResponse(
+  code: 0,
+  data: productStatus,
+  message: 'success',
+);
+
+// 检查响应状态
+if (response.isSuccess && response.canLaunch) {
+  print('服务器授权应用启动');
+}
+```
+
 ### Result<T>
 
 操作结果包装器，用于错误处理。
@@ -546,6 +733,7 @@ if (result.isSuccess) {
 - 支持相同的加密方式
 - 支持相同的API端点
 - 支持相同的设备识别机制
+- 支持产品状态检查和启动控制
 
 ### 服务端配置
 
@@ -559,6 +747,29 @@ port = 8080
 
 [api]
 events_endpoint = "/api/events"
+products_endpoint = "/api/products"  # 新增：产品状态检查端点
+```
+
+### 启动控制 API
+
+服务端需要提供以下端点来支持应用启动控制：
+
+```bash
+# 检查产品状态
+GET /api/products/{productName}
+
+# 响应格式
+{
+  "code": 0,
+  "data": {
+    "name": "HelloWorldApp",
+    "status": "active",  # active=允许启动, 其他=禁止启动
+    "total_devices": 300,
+    "active_devices_7d": 150
+    // ... 其他字段
+  },
+  "message": "success"
+}
 ```
 
 ## 🤝 贡献

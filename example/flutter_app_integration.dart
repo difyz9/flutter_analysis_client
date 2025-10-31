@@ -12,7 +12,7 @@ void main() async {
   // Initialize analytics
   Analytics.initialize(
     serverUrl: 'http://localhost:8080',
-    productName: 'DigiBankApp',
+    productName: 'HelloWorldApp',
     debug: true,
   );
 
@@ -84,7 +84,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'DigiBankApp',
+      title: 'HelloWorldApp',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -99,7 +99,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('DigiBankApp'),
+        title: Text('HelloWorldApp'),
         backgroundColor: Colors.blue,
       ),
       body: Center(
@@ -258,7 +258,7 @@ class AppWithFutureBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'DigiBankApp',
+      title: 'HelloWorldApp',
       home: FutureBuilder<bool>(
         future: _checkAppStatus(),
         builder: (context, snapshot) {
