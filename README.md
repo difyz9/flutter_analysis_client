@@ -133,8 +133,6 @@ void main() async {
 
   // 3. 关闭客户端
   await client.close();
-}
-```
 
   void _initAnalytics() {
     analytics = AnalyticsClient.create(
