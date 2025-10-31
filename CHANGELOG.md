@@ -91,6 +91,61 @@ Analytics.instance.track(name: 'button_click');
 Analytics.trackStatic('page_view');
 ```
 
+## [1.2.0] - 2025-10-31
+
+### Added
+- 🔍 **Product Status Checking**: New API to check if applications can be launched
+  - `checkProductStatus([productName])` - Get detailed product status information
+  - `canLaunchApp([productName])` - Simple boolean check for app launch permission
+  - `ProductStatus` model with comprehensive product information
+  - `ProductStatusResponse` wrapper with success/error handling
+- 🚦 **Application Startup Control**: Ability to conditionally allow/block app startup based on server-side product status
+- 📊 **Enhanced Product Management**: Support for server-side product lifecycle management
+- 🧪 New test suite for product status functionality in `test/product_status_test.dart`
+- 📚 New example showing product status integration in `example/product_status_example.dart`
+
+### API Endpoints
+- `GET /api/products/{productName}` - Check product status
+- Support for status values: `active`, `inactive`, `maintenance`, etc.
+- Only products with `status: "active"` allow app launches
+
+### Models
+- `ProductStatus` - Complete product information model
+  - `name`, `displayName`, `description`
+  - `status`, `iconUrl`, `homepageUrl`
+  - `totalEvents`, `totalDevices`, `totalLicenses`
+  - `activeDevices7d`, `activeDevices30d`, `eventsToday`
+  - `lastActivity`, `firstSeen`, `createdAt`, `updatedAt`
+  - `isActive` computed property for launch permission
+- `ProductStatusResponse` - API response wrapper
+  - `code`, `data`, `message`
+  - `isSuccess` and `canLaunch` computed properties
+
+### Usage Examples
+```dart
+// Check if app can launch
+final canLaunch = await client.canLaunchApp();
+if (canLaunch.isSuccess && canLaunch.value) {
+  // Proceed with app startup
+  await client.reportLaunch();
+} else {
+  // Show maintenance screen
+}
+
+// Get detailed product status
+final status = await client.checkProductStatus();
+if (status.isSuccess && status.value.data?.isActive == true) {
+  print('App is active with ${status.value.data!.totalDevices} devices');
+}
+```
+
+### Benefits
+- ✅ Server-side control over app availability
+- ✅ Graceful handling of maintenance modes
+- ✅ Rich product analytics and lifecycle data
+- ✅ Flexible product status management
+- ✅ Easy integration with existing startup flows
+
 ## [Unreleased]
 
 ### Planned

@@ -201,6 +201,65 @@ class AnalyticsClient {
     );
   }
 
+  /// Check product status by name
+  Future<Result<ProductStatusResponse>> checkProductStatus([String? productName]) async {
+    try {
+      final name = productName ?? _config.productName;
+      final uri = Uri.parse('${_config.serverUrl}/api/products/$name');
+      
+      final response = await _httpClient
+          .get(uri, headers: {
+            'accept': 'application/json',
+            'User-Agent': 'dart-analytics-client/1.0.0',
+          })
+          .timeout(_config.timeout);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        try {
+          final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
+          final statusResponse = ProductStatusResponse.fromJson(jsonData);
+          
+          _log('Product status checked: ${statusResponse.data?.status ?? 'unknown'}');
+          return Success(statusResponse);
+        } catch (e) {
+          return Failure(AnalyticsErrors.serialization(
+            'Failed to parse product status response: $e',
+            operation: 'checkProductStatus',
+            context: {'product_name': name, 'response_body': response.body},
+          ));
+        }
+      } else {
+        return Failure(AnalyticsErrors.network(
+          'Server returned error: ${response.statusCode}',
+          statusCode: response.statusCode,
+          responseBody: response.body,
+          operation: 'checkProductStatus',
+        ));
+      }
+    } on TimeoutException {
+      return Failure(AnalyticsErrors.network(
+        AnalyticsErrors.networkTimeout,
+        operation: 'checkProductStatus',
+      ));
+    } catch (e) {
+      return Failure(AnalyticsErrors.network(
+        'Unexpected error: $e',
+        operation: 'checkProductStatus',
+      ));
+    }
+  }
+
+  /// Check if the product can be launched (status is 'active')
+  Future<Result<bool>> canLaunchApp([String? productName]) async {
+    final result = await checkProductStatus(productName);
+    
+    if (result.isFailure) {
+      return Failure(result.error);
+    }
+    
+    return Success(result.value.canLaunch);
+  }
+
   /// Report app installation
   Future<Result<void>> reportInstall() async {
     try {

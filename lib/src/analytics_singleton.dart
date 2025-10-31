@@ -145,6 +145,16 @@ class Analytics {
     );
   }
   
+  /// Check product status by name
+  Future<Result<ProductStatusResponse>> checkProductStatus([String? productName]) {
+    return _client.checkProductStatus(productName);
+  }
+  
+  /// Check if the product can be launched (status is 'active')
+  Future<Result<bool>> canLaunchApp([String? productName]) {
+    return _client.canLaunchApp(productName);
+  }
+
   /// Report app installation
   Future<Result<void>> reportInstall() {
     return _client.reportInstall();
@@ -230,6 +240,16 @@ class Analytics {
     );
   }
   
+  /// Check product status (static convenience method)
+  static Future<Result<ProductStatusResponse>> checkProductStatusStatic([String? productName]) {
+    return instance.checkProductStatus(productName);
+  }
+  
+  /// Check if app can launch (static convenience method)
+  static Future<Result<bool>> canLaunchAppStatic([String? productName]) {
+    return instance.canLaunchApp(productName);
+  }
+
   /// Set user ID (static convenience method)
   static void setUserIdStatic(String userId) {
     instance.setUserId(userId);

@@ -79,7 +79,13 @@ export 'src/analytics_singleton.dart' show Analytics;
 export 'src/dart_client.dart' show AnalyticsClient;
 
 // Export models and utilities
-export 'src/models.dart' show AnalyticsEvent, DeviceInfo, AnalyticsConfig, EncryptionConfig;
+export 'src/models.dart' show 
+    AnalyticsEvent, 
+    DeviceInfo, 
+    AnalyticsConfig, 
+    EncryptionConfig,
+    ProductStatus,
+    ProductStatusResponse;
 export 'src/errors.dart' show 
     AnalyticsException,
     ConfigurationException,

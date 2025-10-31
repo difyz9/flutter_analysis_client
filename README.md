@@ -245,6 +245,34 @@ final client = AnalyticsClient.create(
 
 ### 事件追踪
 
+#### 产品状态检查
+
+```dart
+// 检查产品状态（用于应用启动控制）
+final statusResult = await client.checkProductStatus();
+if (statusResult.isSuccess) {
+  final statusResponse = statusResult.value;
+  if (statusResponse.canLaunch) {
+    print('✅ 应用可以启动 - 状态为 active');
+    await client.reportLaunch();
+  } else {
+    print('❌ 应用无法启动 - 状态为 ${statusResponse.data?.status}');
+    // 显示维护页面或错误信息
+  }
+}
+
+// 简单的启动检查
+final canLaunchResult = await client.canLaunchApp();
+if (canLaunchResult.isSuccess && canLaunchResult.value) {
+  // 继续应用启动流程
+} else {
+  // 阻止应用启动
+}
+
+// 检查指定产品的状态
+final otherProductResult = await client.checkProductStatus('AnotherApp');
+```
+
 #### 应用生命周期事件
 
 ```dart
@@ -465,6 +493,8 @@ dart test
 - `track({...})` - 追踪事件（支持完整配置）
 - `trackEvent(name, properties)` - 追踪简单事件
 - `trackAction({...})` - 追踪用户行为
+- `checkProductStatus([productName])` - 检查产品状态
+- `canLaunchApp([productName])` - 检查应用是否可以启动
 - `reportInstall()` - 上报安装信息
 - `reportLaunch()` - 上报启动信息
 - `setUserId(userId)` - 设置用户ID
