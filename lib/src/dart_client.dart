@@ -250,10 +250,37 @@ class AnalyticsClient {
   }
 
   /// Check if the product can be launched (status is 'active')
+  /// 
+  /// Returns true if:
+  /// - Product status is 'active'
+  /// - Network connection fails (graceful degradation)
+  /// - Timeout occurs (graceful degradation)
+  /// 
+  /// Returns false only if:
+  /// - Server responds but product status is not 'active'
+  /// - Server returns an error response
   Future<Result<bool>> canLaunchApp([String? productName]) async {
     final result = await checkProductStatus(productName);
     
     if (result.isFailure) {
+      final error = result.error;
+      
+      // Check if it's a network-related error (timeout, connection failure, etc.)
+      // In these cases, allow the app to launch (graceful degradation)
+      if (error is NetworkException) {
+        final isNetworkError = error.message.contains('timeout') ||
+                              error.message.contains('Network error') ||
+                              error.message.contains('Unexpected error') ||
+                              error.statusCode == null; // No status code means connection failed
+        
+        if (isNetworkError) {
+          _log('Network error during status check, allowing app launch (graceful degradation): ${error.message}');
+          return const Success(true);
+        }
+      }
+      
+      // For other types of errors or server errors with status codes, deny launch
+      _log('Status check failed, denying app launch: ${error.message}');
       return Failure(result.error);
     }
     

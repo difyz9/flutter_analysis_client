@@ -172,7 +172,7 @@ void main() async {
   // 初始化客户端
   Analytics.initialize(
     serverUrl: 'http://localhost:8080',
-    productName: 'HelloWorldApp',
+    productName: 'DigiBankApp',
     debug: true,
   );
 
@@ -185,6 +185,51 @@ void main() async {
     runApp(MyApp());
   } else {
     print('❌ 应用无法启动');
+    runApp(MaintenanceApp());
+  }
+}
+```
+
+#### 🌐 网络优雅降级（重要特性）
+
+`canLaunchApp()` 方法具有智能的网络优雅降级功能：
+
+**✅ 允许启动的情况：**
+- 服务器响应且产品状态为 `active`
+- 网络连接失败（优雅降级）
+- 请求超时（优雅降级）
+- 服务器无法访问（优雅降级）
+
+**❌ 拒绝启动的情况：**
+- 服务器明确响应但产品状态不是 `active`
+- 服务器返回具体的错误状态码
+
+```dart
+// 网络优雅降级示例
+void main() async {
+  Analytics.initialize(
+    serverUrl: 'http://localhost:8080',  // 可能无法访问
+    productName: 'DigiBankApp',
+    timeout: Duration(seconds: 5),       // 设置合理超时
+    debug: true,
+  );
+
+  final canLaunch = await Analytics.instance.canLaunchApp();
+  
+  if (canLaunch.isSuccess && canLaunch.value) {
+    // 可能是在线授权，也可能是网络失败的离线模式
+    
+    // 可选：检查是否为离线模式
+    final statusResult = await Analytics.instance.checkProductStatus();
+    if (statusResult.isSuccess) {
+      print('🌐 在线模式 - 服务器授权启动');
+    } else {
+      print('📱 离线模式 - 网络失败，允许离线启动');
+    }
+    
+    runApp(MyApp());
+  } else {
+    print('🚫 服务器明确拒绝启动');
     runApp(MaintenanceApp());
   }
 }
@@ -222,7 +267,7 @@ void main() async {
 }
 ```
 
-#### 启动管理器模式
+#### 启动管理器模式（推荐用于生产环境）
 
 ```dart
 class AppStartupManager {
@@ -231,30 +276,35 @@ class AppStartupManager {
       // 初始化分析客户端
       Analytics.initialize(
         serverUrl: 'http://localhost:8080',
-        productName: 'HelloWorldApp',
+        productName: 'DigiBankApp',
+        timeout: Duration(seconds: 10),     // 合理的超时时间
         debug: true,
       );
 
-      // 检查产品状态
-      final result = await Analytics.instance.checkProductStatus();
+      // 使用 canLaunchApp 进行智能启动检查（包含优雅降级）
+      final launchResult = await Analytics.instance.canLaunchApp();
       
-      if (result.isFailure) {
-        // 网络错误，允许启动（优雅降级）
-        print('⚠️ 无法连接服务器，允许离线启动');
-        return true;
-      }
-
-      final response = result.value;
-      if (response.canLaunch) {
-        print('✅ 服务器授权成功');
+      if (launchResult.isSuccess && launchResult.value) {
+        // 应用可以启动 - 可能是在线授权或离线模式
+        
+        // 可选：获取详细信息来判断运行模式
+        final statusResult = await Analytics.instance.checkProductStatus();
+        if (statusResult.isSuccess) {
+          print('🌐 在线模式 - 服务器授权启动');
+          print('📊 产品状态: ${statusResult.value.data?.status}');
+        } else {
+          print('📱 离线模式 - 网络问题，使用本地启动');
+        }
+        
         await Analytics.instance.reportLaunch();
         return true;
       } else {
-        print('❌ 服务器拒绝启动: ${response.data?.status}');
+        print('🚫 服务器明确拒绝启动');
         return false;
       }
     } catch (e) {
       print('💥 启动检查异常: $e');
+      print('🔄 使用应急模式启动');
       return true; // 异常时允许启动
     }
   }
@@ -273,12 +323,22 @@ void main() async {
 
 #### 状态检查 API 说明
 
-| 方法 | 返回类型 | 说明 |
-|------|----------|------|
-| `canLaunchApp([productName])` | `Result<bool>` | 简单检查是否可以启动 |
-| `checkProductStatus([productName])` | `Result<ProductStatusResponse>` | 获取详细产品状态 |
+| 方法 | 返回类型 | 说明 | 网络失败时行为 |
+|------|----------|------|----------------|
+| `canLaunchApp([productName])` | `Result<bool>` | 简单检查是否可以启动 | ✅ 返回 `true`（优雅降级） |
+| `checkProductStatus([productName])` | `Result<ProductStatusResponse>` | 获取详细产品状态 | ❌ 返回网络错误信息 |
 
 **服务器 API 端点**: `GET /api/products/{productName}`
+
+**`canLaunchApp` 返回 `true` 的情况：**
+- ✅ 服务器响应且状态为 `active`
+- 🌐 网络连接失败（优雅降级）
+- ⏱️ 请求超时（优雅降级）
+- 🔌 服务器无法访问（优雅降级）
+
+**`canLaunchApp` 返回 `false` 的情况：**
+- ❌ 服务器响应但状态不是 `active`
+- 🚫 服务器返回明确的错误状态码
 
 **状态值说明**:
 - `active`: 应用可以正常启动 ✅

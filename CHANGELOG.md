@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2025-10-31
+
+### Enhanced
+- 🌐 **网络优雅降级**: `canLaunchApp()` 现在在网络连接失败时会返回 `true`，允许应用离线启动
+  - 网络超时、连接失败等情况下自动允许启动（优雅降级）
+  - 只有当服务器明确响应且状态不是 `active` 时才拒绝启动
+  - 保持 `checkProductStatus()` 返回详细错误信息的行为不变
+- 📝 **文档更新**: 详细说明了网络优雅降级的行为和使用场景
+- 🧪 **测试覆盖**: 添加了网络失败场景的测试用例
+- 📚 **示例更新**: 新增优雅降级使用示例和最佳实践
+
+### Benefits
+- ✅ 网络问题时应用仍可正常启动
+- ✅ 避免因网络波动导致的应用无法使用
+- ✅ 保持在线和离线模式的平滑切换
+- ✅ 提供更好的用户体验和可用性
+
+### Usage Example
+```dart
+// 网络失败时会自动允许启动
+final canLaunch = await client.canLaunchApp();
+if (canLaunch.isSuccess && canLaunch.value) {
+  // 可能是服务器授权，也可能是网络失败的离线模式
+  runApp(MyApp());
+}
+```
+
 ## [1.0.0] - 2024-10-31
 
 ### Added
