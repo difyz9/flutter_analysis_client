@@ -133,44 +133,6 @@ void main() async {
 
   // 3. 关闭客户端
   await client.close();
-
-  void _initAnalytics() {
-    analytics = AnalyticsClient.create(
-      serverUrl: 'https://your-analytics-server.com',
-      productName: 'YourApp',
-      debug: kDebugMode,
-      userId: 'user-123',
-    );
-    
-    // 上报应用启动（自动收集设备信息）
-    analytics.reportLaunch();
-  }
-
-  @override
-  void dispose() {
-    analytics.close();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () {
-              // 追踪按钮点击事件
-              analytics.trackEvent('button_click', {
-                'button_type': 'primary',
-                'location': 'home_screen',
-              });
-            },
-            child: Text('Click Me'),
-          ),
-        ),
-      ),
-    );
-  }
 }
 ```
 
