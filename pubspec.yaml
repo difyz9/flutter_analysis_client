@@ -1,6 +1,6 @@
 name: flutter_analysis_client
 description: A lightweight analytics client SDK for Flutter applications, providing event tracking, user behavior analysis, and data collection capabilities.
-version: 1.0.2
+version: 1.0.3
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
