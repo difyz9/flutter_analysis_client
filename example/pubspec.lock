@@ -140,7 +140,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.2"
+  flutter_udid:
+    dependency: transitive
+    description:
+      name: flutter_udid
+      sha256: "666412097b86d9a6f9803073d0f0ba70de9b198fe6493d89d352a1f8cd6c5c84"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   flutter_web_plugins:
     dependency: transitive
     description: flutter

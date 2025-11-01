@@ -128,6 +128,12 @@
       "languageVersion": "3.8"
     },
     {
+      "name": "flutter_udid",
+      "rootUri": "file:///Users/apple/.pub-cache/hosted/pub.dev/flutter_udid-2.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "flutter_web_plugins",
       "rootUri": "file:///Users/apple/opt/flutter_3.24.0/packages/flutter_web_plugins",
       "packageUri": "lib/",

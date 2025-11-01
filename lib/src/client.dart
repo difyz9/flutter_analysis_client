@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'models.dart';
 import 'errors.dart';
 import 'encryption.dart';
+import 'device_id_helper.dart';
 
 /// Analytics client for tracking events and user behavior
 class AnalyticsClient {
@@ -155,20 +156,41 @@ class AnalyticsClient {
   }
 
   /// Get or create a persistent device ID
+  /// Uses flutter_udid to get a device-specific unique identifier
+  /// and converts it to a short 16-character hash
   Future<String> _getOrCreateDeviceId() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      String? deviceId = prefs.getString('analytics_device_id');
+      // Use the new DeviceIdHelper to get a short device ID
+      String deviceId = await DeviceIdHelper.getShortDeviceId();
       
-      if (deviceId == null) {
-        deviceId = const Uuid().v4();
-        await prefs.setString('analytics_device_id', deviceId);
+      if (_config.debug) {
+        // Log device ID info in debug mode
+        final info = await DeviceIdHelper.getDeviceIdInfo();
+        _log('Device ID Info:');
+        info.forEach((key, value) {
+          _log('  $key: $value');
+        });
       }
       
       return deviceId;
     } catch (e) {
-      _log('Failed to get/create device ID: $e');
-      return const Uuid().v4();
+      _log('Failed to get device ID from flutter_udid: $e');
+      
+      // Fallback to the old method
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        String? deviceId = prefs.getString('analytics_device_id');
+        
+        if (deviceId == null) {
+          deviceId = const Uuid().v4();
+          await prefs.setString('analytics_device_id', deviceId);
+        }
+        
+        return deviceId;
+      } catch (e2) {
+        _log('Failed to get/create fallback device ID: $e2');
+        return const Uuid().v4();
+      }
     }
   }
 

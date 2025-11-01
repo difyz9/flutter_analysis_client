@@ -99,3 +99,4 @@ export 'src/errors.dart' show
     Success,
     Failure;
 export 'src/encryption.dart' show AESEncryption;
+export 'src/device_id_helper.dart' show DeviceIdHelper;

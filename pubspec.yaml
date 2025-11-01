@@ -16,6 +16,12 @@ dependencies:
   # UUID generation for device and session IDs
   uuid: ^4.1.0
   
+  # Device unique identifier
+  flutter_udid: ^2.0.1
+  
+  # Crypto for hashing UDID
+  crypto: ^3.0.3
+  
   # Device information for analytics (compatible versions)
   device_info_plus: ^9.1.2
   
