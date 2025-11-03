@@ -1,0 +1,23 @@
+# Build outputs
+/build/
+/.dart_tool/
+
+# Test files in root (should be in test/ directory)
+/test_*.dart
+/analyze_*.dart
+
+# Documentation files that are not essential for pub.dev
+/NETWORK_GRACEFUL_DEGRADATION.md
+/PRODUCT_STATUS_GUIDE.md
+/README_UPDATE_SUMMARY.md
+/SINGLETON_IMPLEMENTATION.md
+
+# Development files
+/Makefile
+/.vscode/
+/.idea/
+*.iml
+
+# Git files
+/.git/
+/.gitignore
