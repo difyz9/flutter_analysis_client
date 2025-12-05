@@ -209,29 +209,29 @@ class ProductStatus {
   /// Product status (active, inactive, etc.)
   final String status;
   
-  /// Total events count
-  final int totalEvents;
+  // /// Total events count
+  // final int totalEvents;
   
-  /// Total devices count
-  final int totalDevices;
+  // /// Total devices count
+  // final int totalDevices;
   
-  /// Total licenses count
-  final int totalLicenses;
+  // /// Total licenses count
+  // final int totalLicenses;
   
-  /// Active devices in last 7 days
-  final int activeDevices7d;
+  // /// Active devices in last 7 days
+  // final int activeDevices7d;
   
-  /// Active devices in last 30 days
-  final int activeDevices30d;
+  // /// Active devices in last 30 days
+  // final int activeDevices30d;
   
-  /// Events today count
-  final int eventsToday;
+  // /// Events today count
+  // final int eventsToday;
   
-  /// Last activity timestamp
-  final String lastActivity;
+  // /// Last activity timestamp
+  // final String lastActivity;
   
-  /// First seen timestamp
-  final String firstSeen;
+  // /// First seen timestamp
+  // final String firstSeen;
   
   /// Created at timestamp
   final String createdAt;
@@ -246,14 +246,14 @@ class ProductStatus {
     required this.iconUrl,
     required this.homepageUrl,
     required this.status,
-    required this.totalEvents,
-    required this.totalDevices,
-    required this.totalLicenses,
-    required this.activeDevices7d,
-    required this.activeDevices30d,
-    required this.eventsToday,
-    required this.lastActivity,
-    required this.firstSeen,
+    // required this.totalEvents,
+    // required this.totalDevices,
+    // required this.totalLicenses,
+    // required this.activeDevices7d,
+    // required this.activeDevices30d,
+    // required this.eventsToday,
+    // required this.lastActivity,
+    // required this.firstSeen,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -267,14 +267,14 @@ class ProductStatus {
       iconUrl: json['icon_url'] as String,
       homepageUrl: json['homepage_url'] as String,
       status: json['status'] as String,
-      totalEvents: json['total_events'] as int,
-      totalDevices: json['total_devices'] as int,
-      totalLicenses: json['total_licenses'] as int,
-      activeDevices7d: json['active_devices_7d'] as int,
-      activeDevices30d: json['active_devices_30d'] as int,
-      eventsToday: json['events_today'] as int,
-      lastActivity: json['last_activity'] as String,
-      firstSeen: json['first_seen'] as String,
+      // totalEvents: json['total_events'] as int,
+      // totalDevices: json['total_devices'] as int,
+      // totalLicenses: json['total_licenses'] as int,
+      // activeDevices7d: json['active_devices_7d'] as int,
+      // activeDevices30d: json['active_devices_30d'] as int,
+      // eventsToday: json['events_today'] as int,
+      // lastActivity: json['last_activity'] as String,
+      // firstSeen: json['first_seen'] as String,
       createdAt: json['created_at'] as String,
       updatedAt: json['updated_at'] as String,
     );
@@ -289,14 +289,14 @@ class ProductStatus {
       'icon_url': iconUrl,
       'homepage_url': homepageUrl,
       'status': status,
-      'total_events': totalEvents,
-      'total_devices': totalDevices,
-      'total_licenses': totalLicenses,
-      'active_devices_7d': activeDevices7d,
-      'active_devices_30d': activeDevices30d,
-      'events_today': eventsToday,
-      'last_activity': lastActivity,
-      'first_seen': firstSeen,
+      // 'total_events': totalEvents,
+      // 'total_devices': totalDevices,
+      // 'total_licenses': totalLicenses,
+      // 'active_devices_7d': activeDevices7d,
+      // 'active_devices_30d': activeDevices30d,
+      // 'events_today': eventsToday,
+      // 'last_activity': lastActivity,
+      // 'first_seen': firstSeen,
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
@@ -338,7 +338,7 @@ class ProductStatusResponse {
   }
 
   /// Check if the response is successful
-  bool get isSuccess => code == 0;
+  bool get isSuccess => code == 200;
 
   /// Check if the product can be launched
   bool get canLaunch => isSuccess && data?.isActive == true;

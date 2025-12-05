@@ -214,6 +214,8 @@ class AnalyticsClient {
           })
           .timeout(_config.timeout);
 
+      _log(response.toString());
+      
       if (response.statusCode >= 200 && response.statusCode < 300) {
         try {
           final jsonData = jsonDecode(response.body) as Map<String, dynamic>;

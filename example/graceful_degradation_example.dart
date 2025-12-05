@@ -50,8 +50,7 @@ Future<void> demonstrateGracefulDegradation(AnalyticsClient client) async {
     print('✅ 成功获取产品状态:');
     print('   - 产品名称: ${status?.name}');
     print('   - 当前状态: ${status?.status}');
-    print('   - 设备总数: ${status?.totalDevices}');
-    print('   - 7天活跃: ${status?.activeDevices7d}');
+
     print('   - 可以启动: ${response.canLaunch}\n');
   } else {
     print('❌ 无法获取产品状态: ${statusResult.error}');

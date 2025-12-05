@@ -56,8 +56,7 @@ class AppStartupManager {
       }
 
       print('📊 Product Status: ${productStatus.status}');
-      print('📱 Total Devices: ${productStatus.totalDevices}');
-      print('📈 Active Devices (7d): ${productStatus.activeDevices7d}');
+
 
       if (productStatus.isActive) {
         print('✅ App is authorized to launch');

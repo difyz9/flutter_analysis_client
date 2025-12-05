@@ -219,9 +219,7 @@ class MaintenanceScreen extends StatelessWidget {
               children: [
                 _buildStatusRow('产品名称', status?.name ?? '未知'),
                 _buildStatusRow('当前状态', status?.status ?? '未知'),
-                _buildStatusRow('设备总数', '${status?.totalDevices ?? 0}'),
-                _buildStatusRow('7天活跃', '${status?.activeDevices7d ?? 0}'),
-                _buildStatusRow('30天活跃', '${status?.activeDevices30d ?? 0}'),
+     
                 SizedBox(height: 16),
                 Container(
                   padding: EdgeInsets.all(12),

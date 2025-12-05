@@ -27,11 +27,7 @@ void main() async {
         print('    Name: ${productStatus.name}');
         print('    Display Name: ${productStatus.displayName}');
         print('    Status: ${productStatus.status}');
-        print('    Total Events: ${productStatus.totalEvents}');
-        print('    Total Devices: ${productStatus.totalDevices}');
-        print('    Active Devices (7d): ${productStatus.activeDevices7d}');
-        print('    Active Devices (30d): ${productStatus.activeDevices30d}');
-        print('    Last Activity: ${productStatus.lastActivity}');
+
         
         // Check if app can be launched
         if (productStatus.isActive) {

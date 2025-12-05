@@ -8,8 +8,8 @@ void main() async {
   
   // Create analytics client
   final client = AnalyticsClient.create(
-    serverUrl: 'http://localhost:8080',
-    productName: 'DartApp',
+    serverUrl: 'http://124.222.202.16:8080',
+    productName: 'vid_fetcher',
     debug: true,
     logger: (message) => print('[LOG] $message'),
   );
@@ -25,7 +25,23 @@ void main() async {
     } else {
       print('✗ Failed to report launch: ${launchResult.error}');
     }
-    
+
+  final canLaunch = await client.canLaunchApp();
+
+    print("\n检查应用启动权限:${canLaunch.isSuccess && canLaunch.value}");
+      if (canLaunch.isSuccess && canLaunch.value) {
+        print('✅ 应用启动权限检查通过');
+
+        // 尝试获取详细状态信息
+        final statusResult = await client.checkProductStatus();
+        if (statusResult.isSuccess) {
+          final status = statusResult.value.data;
+          print('📊 产品状态: ${status?.status}');
+
+        } else {
+          print('ℹ️  无法获取详细状态（可能是离线模式）');
+        }
+      }    
     // Track simple events
     await client.trackEvent('button_click', {
       'button_name': 'login',
